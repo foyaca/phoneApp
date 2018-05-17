@@ -48,7 +48,7 @@ class Report extends Component {
   }
 
   setDate = (date) => {
-    this.setState({clients: []})
+    this.setState({clients: [], selectedClient: null})
     this.setState({users: []})
     this.setState({date: date, showDate: false})
     this.getClients()
