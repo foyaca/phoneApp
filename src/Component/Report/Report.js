@@ -127,8 +127,8 @@ class Report extends Component {
                   <Select
                     placeholder={{ label: "Select Client", value: null }}
                     value={this.state.selectedClient}
-                    style={{inputIOS: { paddingLeft: 20, borderBottomWidth: 0.5, borderBottomColor: "black", height: 50, width: "100%", fontSize: 18},
-                    inputAndroid: { paddingLeft: 20, borderBottomWidth: 0.5, borderColor: "black", height: 50, width: "100%"}}}
+                    style={{inputIOS: {color: "black", paddingLeft: 20, borderBottomWidth: 0.5, borderBottomColor: "black", height: 50, width: "100%", fontSize: 18},
+                    inputAndroid: {color: "black", paddingLeft: 20, borderBottomWidth: 0.5, borderColor: "black", height: 50, width: "100%"}}}
                     items={this.state.clients.map( client => ({ label: client.name, value: client.id, key: client.id }) )}
                     onValueChange={(value) => this.setClient(value)}/>
                   </View>
@@ -138,8 +138,8 @@ class Report extends Component {
                 <Select
                   placeholder={{ label: "Select user", value: null }}
                   value={this.state.selectedUser}
-                  style={{inputIOS: { paddingLeft: 20, borderBottomWidth: 0.5, borderBottomColor: "black", height: 50, width: "100%", fontSize: 18},
-                  inputAndroid: { paddingLeft: 20, borderBottomWidth: 0.5, borderColor: "black", height: 50, width: "100%"}}}
+                  style={{inputIOS: {color: "black", paddingLeft: 20, borderBottomWidth: 0.5, borderBottomColor: "black", height: 50, width: "100%", fontSize: 18},
+                  inputAndroid: {color: "black", paddingLeft: 20, borderBottomWidth: 0.5, borderColor: "black", height: 50, width: "100%"}}}
                   items={this.state.users.map(u => ({ label: u.name, value: u.id, key: u.id }))}
                   onValueChange={(value) => this.setState({selectedUser: value})}/>
                 </View>

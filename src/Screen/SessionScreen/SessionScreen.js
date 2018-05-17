@@ -37,8 +37,8 @@ class SessionScreen extends Component {
     this.props.selectInstance(sessionInstance)
     this.props.selectSession(session)
     Promise.all([
-      Icon.getImageSource("edit", 30),
-      Icon.getImageSource("delete-forever", 30)
+      Icon.getImageSource("edit", 30, '#00BFA5'),
+      Icon.getImageSource("delete-forever", 30, '#E87A49')
     ]).then( source => {
       this.props.navigator.push({
         screen: "abalogger.CounterScreen",
@@ -52,12 +52,10 @@ class SessionScreen extends Component {
         navigatorButtons: {
           rightButtons: [{
             icon: source[0],
-            id: "editSession",
-            buttonColor: '#00BFA5'
+            id: "editSession"
           },{
             icon: source[1],
-            id: "removeSession",
-            buttonColor: '#E87A49'
+            id: "removeSession"
           }]
         },
         animated: true, 

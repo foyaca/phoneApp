@@ -161,8 +161,8 @@ class SessionModalScreen extends Component {
               <Select
               placeholder={{ label: "Select place of service", value: null }}
               value={this.state.selectedpos}
-              style={{inputIOS: { padding: 20, borderBottomWidth: 0.5, borderBottomColor: "black", height: 50, width: "100%"},
-              inputAndroid: { padding: 20, borderBottomWidth: 0.5, borderColor: "black", height: 50, width: "100%"}}}
+              style={{inputIOS: {color: "black",  padding: 10, borderBottomWidth: 0.5, borderBottomColor: "black", height: 50, width: "100%"},
+              inputAndroid: {color: "black", padding: 10, borderBottomWidth: 0.5, borderColor: "black", height: 50, width: "100%"}}}
               items={this.setPos()}
               onValueChange={(value) => this.setState({selectedpos: value})}/>
             </View>)
@@ -172,8 +172,8 @@ class SessionModalScreen extends Component {
                 <Select
                 placeholder={{ label: "Select user", value: null }}
                 value={this.state.selectedUser}
-                style={{inputIOS: { padding: 20, borderBottomWidth: 0.5, borderBottomColor: "black", height: 50, width: "100%"},
-                inputAndroid: { padding: 20, borderBottomWidth: 0.5, borderColor: "black", height: 50, width: "100%"}}}
+                style={{inputIOS: {color: "black",  padding: 10, borderBottomWidth: 0.5, borderBottomColor: "black", height: 50, width: "100%"},
+                inputAndroid: {color: "black", padding: 10, borderBottomWidth: 0.5, borderColor: "black", height: 50, width: "100%"}}}
                 items={this.state.users.map(u => ({ label: u.name, value: u.id, key: u.id }))}
                 onValueChange={(value) => this.setUser(value)}/>
               </View>)
@@ -183,8 +183,8 @@ class SessionModalScreen extends Component {
                     <Select
                     placeholder={{ label: "Select Service", value: null }}
                     value={this.state.caregiver_training}
-                    style={{inputIOS: { padding: 20, borderBottomWidth: 0.5, borderBottomColor: "black", height: 50, width: "100%", fontSize: 12},
-                    inputAndroid: { padding: 20, borderBottomWidth: 0.5, borderColor: "black", height: 50, width: "100%"}}}
+                    style={{inputIOS: {color: "black",  padding: 10, borderBottomWidth: 0.5, borderBottomColor: "black", height: 50, width: "100%", fontSize: 12},
+                    inputAndroid: {color: "black", padding: 10, borderBottomWidth: 0.5, borderColor: "black", height: 50, width: "100%"}}}
                     items={[{ label: "BA Service", value: false, key: 1 }, { label: "Caregiver Training", value: true, key: 2}]}
                     onValueChange={(value) => this.setState({caregiver_training: value})}/>
                   </View>)
