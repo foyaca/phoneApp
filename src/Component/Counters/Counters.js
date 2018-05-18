@@ -8,7 +8,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 import axios from 'axios'
 import moment from 'moment'
 import ShowMessage from '../ShowMessage/ShowMessage'
-import CheckBox from 'react-native-checkbox';
 
 class Counters extends Component {
   state = {
