@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, FlatList, Text, TextInput, StyleSheet, Alert, TouchableOpacity } from "react-native"
+import { View, FlatList, Text, TextInput, StyleSheet, Alert, TouchableOpacity, Switch } from "react-native"
 import Select from 'react-native-picker-select'
 import { connect } from 'react-redux'
 import { setCounters, selectCounter, showMessage, message, loading } from '../../store/actions/index'
@@ -165,12 +165,14 @@ class Counters extends Component {
           <Text style={styles.header}>{counter[0].type}</Text>
         </View>
         <View style={styles.wrapButton}>
-          <CheckBox
-          labelStyle={{fontSize: 18}}
-            label='No Data'
-            checked={c.no_data}
-            onChange={(checked) => this.request(action, "no_data", counter[0].id, c.trials, c.count, !checked, c.id, "no_data")}
-          />
+          <View style={styles.checkboxStyle}> 
+            <Switch
+              style={{height: "100%"}}
+              value={c.no_data}
+              onValueChange={(checked) => this.request(action, "no_data", counter[0].id, c.trials, c.count, checked, c.id, "no_data")}
+            />
+            <Text style={styles.noDataText}>No Data</Text>
+          </View>
           <View style={styles.buttonContainer}>
             <TouchableOpacity onPress={() => this.request(action, "count", counter[0].id, c.trials, c.count, c.no_data, c.id, "decrease")}>
               <Icon name="remove-circle-outline" color="#E87A49" size={40} />
@@ -193,12 +195,14 @@ class Counters extends Component {
           <Text style={styles.header}>{counter[0].type}</Text>
         </View>
         <View style={styles.wrapButton}>
-          <CheckBox
-            labelStyle={{fontSize: 18}}
-            label='No Data'
-            checked={c.no_data}
-            onChange={(checked) => this.request(action, "no_data", counter[0].id, c.trials, c.count, !checked, c.id, "no_data")}
-          />
+          <View style={styles.checkboxStyle}> 
+            <Switch
+              style={{height: "100%"}}
+              value={c.no_data}
+              onValueChange={(checked) => this.request(action, "no_data", counter[0].id, c.trials, c.count, checked, c.id, "no_data")}
+            />
+            <Text style={styles.noDataText}>No Data</Text>
+          </View>
           <View style={styles.buttonContainer}>
             <TouchableOpacity onPress={() => this.request(action, "trials", counter[0].id, c.trials, c.count, c.no_data, c.id, "decrease", "percent")}>
               <Icon name="remove-circle-outline" color="#E87A49" size={40} />
@@ -230,36 +234,35 @@ class Counters extends Component {
           <Text style={styles.header}>{counter[0].type}</Text>
         </View>
         <View style={styles.wrapButton}>
-          <View style={styles.ScrollContainer}>
-            <CheckBox
-              checkboxStyle={{marginTop: 18, marginLeft: "34.9%", borderColor: "#ecf2f9"}}
-              labelStyle={{marginTop: 18, fontSize: 18}}
-              label='No Data'
-              checked={c.no_data}
-              onChange={(checked) => this.requestTime(action, null, c.id, !checked, "no_data")}
+          <View style={styles.checkboxStyle}> 
+            <Switch
+              value={c.no_data}
+              onValueChange={(checked) => this.request(action, "no_data", counter[0].id, c.trials, c.count, checked, c.id, "no_data")}
             />
-            <View style={styles.buttonScrollContainer}>
-              <TextInput style={styles.textInput} underlineColorAndroid='white' value={this.state.timeValue}
-                placeholder="Insert time" onChangeText={this.onAddTimeHandler} keyboardType='numeric'/>
-              <TouchableOpacity onPress={() => this.requestTime(action, counter[0].id, c.id, c.no_data)}>
-                <Icon name="add-circle-outline" color="#00BFA5" size={45} />
-              </TouchableOpacity>
-            </View>
-            <FlatList
-              data={this.getTimesConuter(counter[0].behavior_times, c.id)}
-              renderItem={(time) => (
-                <View key={time.item.id} style={styles.listItems}>
-                  <Text style={styles.showCounterScroll}>Duration: {time.item.time}s</Text>
-                  <TouchableOpacity onPress={() => this.removeAlert(time.item.id, c.no_data)}>
-                    <Icon name="delete-forever" color="#E87A49" size={30} />
-                  </TouchableOpacity>
-                </View>
-              )}
-              keyExtractor={(item, index) => index}
-            />
+            <Text style={styles.noDataText}>No Data</Text>
           </View>
+          <View style={styles.buttonScrollContainer}>
+            <TextInput style={styles.textInput} underlineColorAndroid='white' value={this.state.timeValue}
+              placeholder="Insert time" onChangeText={this.onAddTimeHandler} keyboardType='numeric'/>
+            <TouchableOpacity onPress={() => this.requestTime(action, counter[0].id, c.id, c.no_data)}>
+              <Icon name="add-circle-outline" color="#00BFA5" size={45} />
+            </TouchableOpacity>
+          </View>
+          <FlatList
+            data={this.getTimesConuter(counter[0].behavior_times, c.id)}
+            renderItem={(time) => (
+              <View key={time.item.id} style={styles.listItems}>
+                <Text style={styles.showCounterScroll}>Duration: {time.item.time}s</Text>
+                <TouchableOpacity onPress={() => this.removeAlert(time.item.id, c.no_data)}>
+                  <Icon name="delete-forever" color="#E87A49" size={30} />
+                </TouchableOpacity>
+              </View>
+            )}
+            keyExtractor={(item, index) => index}
+          />
         </View>
       </View>
+     
     )
   }
 
@@ -407,10 +410,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 4
   },
-  ScrollContainer: {
-    width: "100%",
-    height: "100%"
-  },
   listItems: {
     width: "80%",
     flexDirection: "row",
@@ -487,6 +486,17 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     color: "#1C2331"
   },
+  checkboxStyle: {
+    flexDirection: "row",
+    marginTop: 5,
+    justifyContent: "center"
+  },
+  noDataText: {
+    height: "100%",
+    paddingLeft: 5,
+    fontSize: 22  ,
+    justifyContent: "center"
+  }
 })
 
 const mapStateToProps = state => {

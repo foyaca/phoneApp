@@ -143,10 +143,10 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   backgroundImage: {
-    width: 200,
-    height: 200,
+    width: 130,
+    height: 130,
     position: 'absolute',
-    top: -100
+    top: -74
   },
   form: {
     width: "100%",
