@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
     borderColor: "#4080bf",
     borderWidth: 0.2,
     borderRadius: 5,
+    overflow: 'hidden'
   },
   domainContainer: {
     flexDirection: "row",

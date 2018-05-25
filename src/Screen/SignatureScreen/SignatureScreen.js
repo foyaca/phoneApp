@@ -40,13 +40,13 @@ class SignatureScreen extends Component {
       this.props.showLoading(true)
       if (this.props.signature === null) {
         if (this.props.forWho === "Client")
-          params = {signature: { client_id: client_id, user_id: user_id, date: date, client_signature: result.encoded }}
+          params = {signature: { client_id: client_id, user_id: user_id, date: date, client_signature: result.encodedn, session_id: this.props.session_id }}
         else
-          params = {signature: { client_id: client_id, user_id: user_id, date: date, user_signature: result.encoded }}
+          params = {signature: { client_id: client_id, user_id: user_id, date: date, user_signature: result.encoded, session_id: this.props.session_id }}
         axios.post(`${getDomain(this.props.domain)}/signatures`,
           params, {
           headers: {Authorization: `${token}`}
-        }).then(res =>{
+        }).then(res =>{ 
           this.props.showLoading(false)
           this.props.setSignature(res.data)
           this.props.navigator.dismissModal({animationType: 'slide-down'})

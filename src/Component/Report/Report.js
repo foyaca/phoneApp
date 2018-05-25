@@ -68,6 +68,7 @@ class Report extends Component {
       }).then(res =>{
         this.setState({users: res.data})
         this.props.showLoading(false)
+        this.props.showMessage(false)
       }).catch(error => {
         console.log(error)
       })
@@ -154,7 +155,7 @@ class Report extends Component {
         />
         <View style={styles.dateContainer}>
           <View style={styles.dateText}>
-            <Text style={styles.date}>{moment(this.state.date).format("MMM, YYYY")}</Text>
+            <Text style={styles.date}>{moment(this.state.date).format("MMM DD, YYYY")}</Text>
           </View>
           <TouchableOpacity style={styles.icon} onPress={() => this.setState({showDate: true}) }>
              <Icon name="date-range" size={25} color="#616161" />

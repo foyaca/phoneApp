@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   listItem: {
     flexDirection: "column",
     padding: 20,
-    height: "85%",
+    height: "100%",
     width: "40%",
     alignItems: "center",
     justifyContent: "center",

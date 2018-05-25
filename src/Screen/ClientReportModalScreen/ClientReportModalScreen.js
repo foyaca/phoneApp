@@ -14,7 +14,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 class ClientReportModalScreen extends Component {
   state = {
     sessions: [],
-    tableHead: ["Session Date", "Service", "POS", "Time", "Total"]
+    tableHead: ["Session Date", "Service", "POS", "Time", "Total"],
+    signature: null
   }
 
   constructor(props) {
@@ -28,31 +29,14 @@ class ClientReportModalScreen extends Component {
     token = this.props.token
     client_id = this.props.clientSelected[0].id
     user_id = this.props.userSelected[0].id
-    date = moment(this.props.date)
+    date = moment(this.props.date).format("YYYY-MM-DD")
     axios.get(`${getDomain(this.props.domain)}/reports/user_hours_report`, {
-      params: { client_id: client_id, user_id: user_id, config_range: true, start_day: date.startOf('month').format("YYYY-MM-DD"), end_day: date.endOf('month').format("YYYY-MM-DD")}, 
+      params: { client_id: client_id, user_id: user_id, config_day: true, start_day: date}, 
       headers: {Authorization: `${token}`}
     }).then(res =>{
+      this.props.showLoading(false)
       this.setState({sessions: res.data})
-      this.getSignature(client_id, user_id, date, token)
-    }).catch(error => {
-      console.log(error)
-      this.props.sendMessage("Something went wrong. Please try again.")
-      this.props.showMessage(true)
-      this.props.showLoading(false)
-    })
-  }
-
-  getSignature = (client_id, user_id, date, token) => {
-    date = date.format("YYYY-MM-DD")
-    axios.get(`${getDomain(this.props.domain)}/signatures`, {
-      params: { client_id, user_id, date}, 
-      headers: {Authorization: `${token}`}
-    }).then(res =>{
-      this.props.showLoading(false)
-      if (res.data !== undefined) {
-        this.props.setSignature(res.data)
-      }     
+      this.props.setSignature(res.data[0].signature)
     }).catch(error => {
       console.log(error)
       this.props.sendMessage("Something went wrong. Please try again.")
@@ -134,7 +118,7 @@ class ClientReportModalScreen extends Component {
       screen: "abalogger.SignatureScreen",
       title: `Set ${forWho} Signature`,
       animationType: 'slide-up',
-      passProps: {clientSelected: this.props.clientSelected, date: this.props.date, userSelected: this.props.userSelected, forWho: forWho},
+      passProps: {clientSelected: this.props.clientSelected, date: this.props.date, userSelected: this.props.userSelected, forWho: forWho, session_id: this.state.sessions[0].id},
       navigatorStyle: {
         navBarBackgroundColor: '#4080bf',
         navBarButtonColor: 'white',

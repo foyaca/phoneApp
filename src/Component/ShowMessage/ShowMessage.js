@@ -20,13 +20,15 @@ const styles = StyleSheet.create({
   container: {
     position: 'absolute',
     backgroundColor: '#E87A49',
+    justifyContent: "center",
     height: 40,
     left: 0, 
     bottom: 0, 
     width: "100%"
   },
   message: {
-    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
     color: "#474747",
     textAlign: 'center',
     fontSize: 17,
