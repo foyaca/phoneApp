@@ -21,7 +21,7 @@ class MonthScreen extends Component {
     this.props.removeReportUsers()
   }
 
-  setDate = (date) => {
+  getClients = (date) => {
     date = moment(date).format("YYYY-MM-DD")
     this.props.showLoading(true)
     token = this.props.token
@@ -49,10 +49,10 @@ class MonthScreen extends Component {
       <View style={styles.superContainer}>
         <MonthPicker
           maxDate={moment().endOf("year")}
-          monthTapped={(date) => this.setDate(date)}
+          monthTapped={(date) => this.getClients(date)}
         />
         <View style={styles.backButton}>
-          <TouchableOpacity style={styles.button} onPress={() => this.props.navigator.dismissModal({animationType: 'slide-down'})}>
+          <TouchableOpacity style={styles.button} onPress={() => this.getClients(this.props.date === "" ? moment().format("YYYY-MM-DD") : this.props.date)}>
             <Text style={styles.backText}>Back</Text>
           </TouchableOpacity>
         </View>
@@ -92,7 +92,8 @@ const mapStateToProps = (state) => {
   return {
     user: state.user.user,
     token: state.auth.token,
-    domain: state.auth.domain
+    domain: state.auth.domain,
+    date: state.report.reportDate
   }
 }
 
