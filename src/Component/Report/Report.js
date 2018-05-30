@@ -4,21 +4,16 @@ import getDomain from '../../lib/domain'
 import { connect } from 'react-redux'
 import filterClientPerPlan from '../../lib/filterClientPerPlan'
 import Select from 'react-native-picker-select'
-import { loading, message, showMessage }  from '../../store/actions/index'
+import { loading, message, showMessage, setReportClients, setReportUsers, removeReportUsers, setReportDate }  from '../../store/actions/index'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import axios from 'axios'
 import moment from 'moment'
-import TimePicker from 'react-native-modal-datetime-picker'
 import Loading from '../Loading/Loading'
 import ShowMessage from '../ShowMessage/ShowMessage'
 
 class Report extends Component {
   state = {
-    clients: [],
     selectedClient: null,
-    showDate: false,
-    date: moment().format("YYYY-MM-DD"),
-    users: [],
     selectedUser: (this.props.user !== undefined && this.props.user.role[0] === "admin") ? null : this.props.user.id
   }
 
@@ -31,13 +26,14 @@ class Report extends Component {
     user = this.props.user
     user_id = user.id
     token = this.props.token
-    date = this.state.date
+    date = this.props.date === "" ? moment().format("YYYY-MM-DD") : moment(this.props.date).format("YYYY-MM-DD")
+    this.props.setReportDate(date)
     axios.get(`${getDomain(this.props.domain)}/clients`, {
       params: { user_id: user_id }, 
       headers: {Authorization: `${token}`}
     }).then(res =>{
       clients = filterClientPerPlan(res.data, user, date)
-      this.setState({clients: clients})
+      this.props.setReportClients(clients)
       this.props.showLoading(false)
     }).catch(error => {
       console.log(error)
@@ -47,26 +43,19 @@ class Report extends Component {
     })
   }
 
-  setDate = (date) => {
-    this.setState({clients: [], selectedClient: null})
-    this.setState({users: []})
-    this.setState({date: date, showDate: false})
-    this.getClients()
-  }
-
   setClient = (id) => {
     this.setState({selectedClient: id})
     if (this.props.user.role[0] === "admin") {
       this.props.showLoading(true)
-      this.setState({users: []})
+      this.props.removeReportUsers()
       token = this.props.token
       client_id = id
-      date = this.state.date
+      date = this.props.date === "" ? moment().format("YYYY-MM-DD") : moment(this.props.date).format("YYYY-MM-DD")
       axios.get(`${getDomain(this.props.domain)}/users/get_users_by_client`, {
         params: { client_id , date }, 
         headers: {Authorization: `${token}`}
       }).then(res =>{
-        this.setState({users: res.data})
+        this.props.setReportUsers(res.data)
         this.props.showLoading(false)
         this.props.showMessage(false)
       }).catch(error => {
@@ -76,7 +65,7 @@ class Report extends Component {
   }
 
   getClient = () => {
-    client = this.state.clients.filter(c=> {
+    client = this.props.clients.filter(c=> {
       if (this.state.selectedClient === c.id)
         return c
     })
@@ -85,7 +74,7 @@ class Report extends Component {
 
   getUser = () => {
     if (this.props.user.role[0] === "admin") {
-      user = this.state.users.filter(u=> {
+      user = this.props.users.filter(u=> {
         if (this.state.selectedUser === u.id)
           return u
       })
@@ -117,47 +106,41 @@ class Report extends Component {
       )
       return
     }
-    this.props.getReport(this.getClient(), this.state.date, this.getUser())
+    this.props.getReport(this.getClient(), this.props.date, this.getUser())
   }
 
   render() {
     clients = null
     users = null
-    if (this.state.clients.length> 0)
+    if (this.props.clients.length > 0)
       clients = (<View style={styles.serviceContainer}>
                   <Select
                     placeholder={{ label: "Select Client", value: null }}
                     value={this.state.selectedClient}
                     style={{inputIOS: {color: "black", paddingLeft: 20, borderBottomWidth: 0.5, borderBottomColor: "black", height: 50, width: "100%", fontSize: 18},
                     inputAndroid: {color: "black", paddingLeft: 20, borderBottomWidth: 0.5, borderColor: "black", height: 50, width: "100%"}}}
-                    items={this.state.clients.map( client => ({ label: client.name, value: client.id, key: client.id }) )}
+                    items={this.props.clients.map( client => ({ label: client.name, value: client.id, key: client.id }) )}
                     onValueChange={(value) => this.setClient(value)}/>
                   </View>
                 )
-    if (this.props.user.role !== undefined && this.props.user.role[0] === "admin" && this.state.users.length > 0)             
+    if (this.props.user.role !== undefined && this.props.user.role[0] === "admin" && this.props.users.length > 0)             
       users = (<View style={styles.serviceContainer}>
                 <Select
                   placeholder={{ label: "Select user", value: null }}
                   value={this.state.selectedUser}
                   style={{inputIOS: {color: "black", paddingLeft: 20, borderBottomWidth: 0.5, borderBottomColor: "black", height: 50, width: "100%", fontSize: 18},
                   inputAndroid: {color: "black", paddingLeft: 20, borderBottomWidth: 0.5, borderColor: "black", height: 50, width: "100%"}}}
-                  items={this.state.users.map(u => ({ label: u.name, value: u.id, key: u.id }))}
+                  items={this.props.users.map(u => ({ label: u.name, value: u.id, key: u.id }))}
                   onValueChange={(value) => this.setState({selectedUser: value})}/>
                 </View>
               )            
     return (
       <View style={styles.container}>
-        <TimePicker
-          mode="date"
-          isVisible={this.state.showDate}
-          onConfirm={(date) => this.setDate(date)}
-          onCancel={() => this.setState({showDate: false})}
-        />
         <View style={styles.dateContainer}>
           <View style={styles.dateText}>
-            <Text style={styles.date}>{moment(this.state.date).format("MMM DD, YYYY")}</Text>
+            <Text style={styles.date}>{this.props.date === "" ? moment().format("MMM, YYYY") : moment(this.props.date).format("MMM, YYYY")}</Text>
           </View>
-          <TouchableOpacity style={styles.icon} onPress={() => this.setState({showDate: true}) }>
+          <TouchableOpacity style={styles.icon} onPress={() => this.props.getMonth() }>
              <Icon name="date-range" size={25} color="#616161" />
           </TouchableOpacity>
         </View>
@@ -232,7 +215,10 @@ const mapStateToProps = (state) => {
   return {
     user: state.user.user,
     token: state.auth.token,
-    domain: state.auth.domain
+    domain: state.auth.domain,
+    clients: state.report.reportClients,
+    users: state.report.reportUsers,
+    date: state.report.reportDate
   }
 }
 
@@ -240,7 +226,11 @@ const mapDispatchToProps = (dispatch) => {
   return {
     showLoading: (animate) => dispatch(loading(animate)),
     showMessage: (show) => dispatch(showMessage(show)),
-    sendMessage: (text) => dispatch(message(text))
+    sendMessage: (text) => dispatch(message(text)),
+    setReportClients: (clients) => dispatch(setReportClients(clients)),
+    setReportUsers: (users) => dispatch(setReportUsers(users)),
+    removeReportUsers: () => dispatch(removeReportUsers()),
+    setReportDate: (date) => dispatch(setReportDate(date))
   }
 }
 

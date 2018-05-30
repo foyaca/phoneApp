@@ -5,7 +5,7 @@ const filterClientPerPlan = (clients, user, date) => {
     for (const plan of client.plans) {
       const starting_on = moment(plan.starting_on).format("YYYY-MM-DD")
       const ending_on = moment(plan.ending_on).format("YYYY-MM-DD")
-      if (moment(date).isSameOrAfter(starting_on) && moment(date).isSameOrBefore(ending_on)){
+      if (moment(date).isSameOrAfter(starting_on, 'month') && moment(date).isSameOrBefore(ending_on, 'month')){
         if (user.role[0] === "admin") {
           return true
         }

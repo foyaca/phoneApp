@@ -7,6 +7,7 @@ import User from './reducers/User/User'
 import Calendar from './reducers/Calendar/Calendar'
 import Sessions from './reducers/Sessions/Sessions'
 import Signature from './reducers/Signature/Signature'
+import Report from './reducers/Report/Report'
 
 const rootReducer  = combineReducers({
   auth: Auth,
@@ -16,7 +17,8 @@ const rootReducer  = combineReducers({
   clients: Clients,
   calendar: Calendar,
   sessions: Sessions,
-  signature: Signature
+  signature: Signature,
+  report: Report
 })
 
 const configureStore = () => {

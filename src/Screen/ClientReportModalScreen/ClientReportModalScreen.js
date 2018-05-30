@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Alert} from 'react-native'
 import { Table, TableWrapper, Row } from 'react-native-table-component'
 import {connect} from 'react-redux'
-import { setSignature, removeSignature } from '../../store/actions/index'
+import { setSignature, removeSignature, setReportSessions } from '../../store/actions/index'
 import { loading, message, showMessage }  from '../../store/actions/index'
 import moment from 'moment'
 import getDomain from '../../lib/domain'
@@ -13,30 +13,24 @@ import Icon from 'react-native-vector-icons/MaterialIcons'
 
 class ClientReportModalScreen extends Component {
   state = {
-    sessions: [],
-    tableHead: ["Session Date", "Service", "POS", "Time", "Total"],
-    signature: null
-  }
-
-  constructor(props) {
-    super(props)
+    tableHead: ["Session Date", "Signed?"]
   }
 
   componentWillMount() {
     this.props.removeSignature()
     this.props.showLoading(true)
-    this.setState({signatureId: null})
     token = this.props.token
     client_id = this.props.clientSelected[0].id
     user_id = this.props.userSelected[0].id
-    date = moment(this.props.date).format("YYYY-MM-DD")
+    date = moment(this.props.date)
     axios.get(`${getDomain(this.props.domain)}/reports/user_hours_report`, {
-      params: { client_id: client_id, user_id: user_id, config_day: true, start_day: date}, 
+      params: { client_id: client_id, user_id: user_id, config_range: true,
+        start_day: date.startOf("month").format("YYYY-MM-DD"), end_day: date.endOf("month").format("YYYY-MM-DD")}, 
       headers: {Authorization: `${token}`}
     }).then(res =>{
       this.props.showLoading(false)
-      this.setState({sessions: res.data})
-      this.props.setSignature(res.data[0].signature)
+      this.props.setReportSessions(res.data)
+      console.log(res.data)
     }).catch(error => {
       console.log(error)
       this.props.sendMessage("Something went wrong. Please try again.")
@@ -45,80 +39,28 @@ class ClientReportModalScreen extends Component {
     })
   }
 
-  removeSignature = (params, token) => {
-    this.props.showLoading(true)
-    axios.patch(`${getDomain(this.props.domain)}/signatures/${this.props.signature.id}`, 
-    params, { 
-    headers: {Authorization: `${token}`}
-    }).then(res =>{
-      this.props.showLoading(false)
-      this.props.setSignature(res.data)
-    }).catch(error => {
-      console.log(error)
-      this.props.sendMessage("Something went wrong updtae. Please try again.")
-      this.props.showMessage(true)
-      this.props.showLoading(false)
-    })
-  }
-
-  deleteSignature = (forWho) => {
-    token = this.props.token
-    if (forWho === "Client" && this.props.signature !== null && this.props.signature.client_signature !== null) {
-      params = {signature: {client_signature: '' }}
-      this.removeSignature(params, token)
+  getSessionObject = (sessions) => {
+    total = 0
+    array = []
+    for (session of sessions) {
+      array.push([ moment(session.session_date).format("ddd MMM, DD YYYY"), session.signature !== null ? "YES" : "NO", session.id])
     }
-    else if ( forWho === "User" && this.props.signature !== null && this.props.signature.user_signature !== null) {
-      params = {signature: {user_signature: '' }}
-      this.removeSignature(params, token)
-    }
-  }
-
-  showClientSignature = () => {
-    Alert.alert(
-      'Client Signature',
-      'What do you want to do?',
-      [
-        {text: 'Set Siganture', onPress: () => this.signature("Client")},
-        {text: 'Delete Signature', onPress: () => this.deleteSignatureAlert("Client")},
-        {text: 'Cancel', onPress: () => null, style: 'cancel'}
-      ],
-      { cancelable: true }
-    )
-  }
-
-  showUserSignature = () => {
-    this.props.showMessage(false)
-    Alert.alert(
-      'User Signature',
-      'What do you want to do?',
-      [
-        {text: 'Set Siganture', onPress: () => this.signature("User")},
-        {text: 'Delete Signature', onPress: () => this.deleteSignatureAlert("User")},
-        {text: 'Cancel', onPress: () => null, style: 'cancel'}
-      ],
-      { cancelable: true }
-    )
-  }
-
-  deleteSignatureAlert = (forWho) => {
-    this.props.showMessage(false)
-    Alert.alert(
-      'Warning!',
-      'Are you sure you want to delete this signature?',
-      [
-        {text: 'Delete', onPress: () => this.deleteSignature(forWho)},
-        {text: 'Cancel', onPress: () => null, style: 'cancel'},
-      ],
-      { cancelable: false }
-    )
+    return array
   }
   
-  signature = (forWho) => {
+  getSignature = (session_id) => {
+    this.props.sessions.filter((s) => {
+      if (s.id === session_id) {
+        session = s
+        return
+      }
+    })
     this.props.navigator.showModal({
-      screen: "abalogger.SignatureScreen",
-      title: `Set ${forWho} Signature`,
+      screen: "abalogger.ClientReportSignatureScreen",
+      title: "Signature",
       animationType: 'slide-up',
-      passProps: {clientSelected: this.props.clientSelected, date: this.props.date, userSelected: this.props.userSelected, forWho: forWho, session_id: this.state.sessions[0].id},
+      passProps: {session: session, clientSelected: this.props.clientSelected, 
+        userSelected: this.props.userSelected},
       navigatorStyle: {
         navBarBackgroundColor: '#4080bf',
         navBarButtonColor: 'white',
@@ -132,36 +74,9 @@ class ClientReportModalScreen extends Component {
     })
   }
 
-  getSessionObject = (sessions) => {
-    total = 0
-    array = []
-    for (session of sessions) {
-      for (instance of session.session_instances) {
-        if (this.props.user.role[0] !== "RBT")
-          service = instance.caregiver_training ? "CT" : "BAS"
-        else
-          service = "N/A"
-        start = moment(instance.start_time).utc()
-        end = moment(instance.end_time).utc()
-        time = `${start.format("h:mm A")} ${end.format("h:mm A")}`
-        diff = end.diff(start)/3600000
-        total += parseFloat(diff)
-        array.push([ moment(session.session_date).format("ddd MMM, DD YYYY"), service, instance.place_of_service, time, diff])
-      }
-    }
-    array.push(["Total", "", "", "", total])
-    return array
-  }
-
   render() {
-    if (this.state.sessions.length > 0) {
-      clientbase64Icon = `data:image/png;base64`
-      userbase64Icon = `data:image/png;base64`
-      if (this.props.signature !== null) {
-        clientbase64Icon = `data:image/png;base64,${this.props.signature.client_signature}`
-        userbase64Icon = `data:image/png;base64,${this.props.signature.user_signature}`
-      }
-      sessions = this.getSessionObject(this.state.sessions)
+    if (this.props.sessions.length > 0) {
+      sessions = this.getSessionObject(this.props.sessions)
       return (
         <View style={styles.container}>
           <View style={styles.headerContainer}>
@@ -176,31 +91,19 @@ class ClientReportModalScreen extends Component {
               <Table borderStyle={{borderColor: '#C1C0B9'}}>
                 {
                   sessions.map((rowData, index) => (
-                    <Row
-                      key={index}
-                      data={rowData}
-                      style={styles.cell}
-                      style={[styles.row, index%2 && {backgroundColor: '#9E9E9E'}]}
-                      textStyle={styles.text}
-                    />
+                    <TouchableOpacity onPress={() => this.getSignature(rowData[2])}>
+                      <Row
+                        key={index}
+                        data={rowData.slice(0,2)}
+                        style={styles.cell}
+                        style={[styles.row, index%2 && {backgroundColor: '#9E9E9E'}]}
+                        textStyle={styles.text}
+                      />
+                    </TouchableOpacity>  
                   ))
                 }
               </Table>
             </ScrollView>
-          </View>
-          <View style={styles.ButtonContainer}>
-          <TouchableOpacity style={styles.signatureContainer} onPress={() => this.showUserSignature()}>
-              <Image style={styles.image} source={{uri: userbase64Icon}}/>
-              <View style={styles.signature}>
-                <Text>RBT/BCaBA/BCBA Signature</Text>
-              </View>
-            </TouchableOpacity>  
-            <TouchableOpacity style={styles.signatureContainer} onPress={() => this.showClientSignature()}>
-              <Image style={styles.image} source={{uri: clientbase64Icon}}/>
-              <View style={styles.signature}>
-                <Text>Parent/Caregiver Signature</Text>
-              </View>
-            </TouchableOpacity>  
           </View>
           <View style={styles.backButtonContainer}>
             <TouchableOpacity style={styles.button} onPress={() => this.props.navigator.dismissModal({animationType: 'slide-down'})}>
@@ -250,16 +153,11 @@ const styles = StyleSheet.create({
   },
   tableContainer: {
     width: "90%",
-    height: "55%",
-  },
-  ButtonContainer: {
-    flexDirection: "row",
-    height: "23%",
-    width: "90%",
-    marginBottom: "5%"
+    height: "78%",
+    marginBottom: "3%"
   },
   backButtonContainer: {
-    height: "30%",
+    height: "35%",
     width: "90%"
   },
   cell: {
@@ -281,27 +179,6 @@ const styles = StyleSheet.create({
   row: { 
     height: 50,
     backgroundColor: '#E0E0E0' 
-  },
-  signatureContainer: {
-    height: "100%",
-    width: "48%",
-    backgroundColor: "white",
-    alignItems: "center",
-    marginBottom: "2%",
-    marginTop: "2%"
-  },
-  image: {
-    width: "95%",
-    height: "95%",
-    backgroundColor: "white",
-  },
-  signature: {
-    position: "absolute",
-    bottom: 5,
-    width: "75%",
-    alignItems: "center",
-    borderTopWidth: 0.5,
-    borderTopColor: "black"
   },
   button: {
     width: "100%",
@@ -341,7 +218,8 @@ const mapStateToProps = state => {
     token: state.auth.token,
     domain: state.auth.domain,
     user: state.user.user,
-    signature: state.signature.signature
+    signature: state.signature.signature,
+    sessions: state.report.reportSessions
   }
 }
 
@@ -351,6 +229,7 @@ const mapDispatchToProps = (dispatch) => {
     removeSignature: () => dispatch(removeSignature()),
     showLoading: (animate) => dispatch(loading(animate)),
     showMessage: (show) => dispatch(showMessage(show)),
+    setReportSessions: (sessions) => dispatch(setReportSessions(sessions)),
     sendMessage: (text) => dispatch(message(text))
   }
 }
