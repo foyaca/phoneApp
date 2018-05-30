@@ -4,7 +4,7 @@ import TimePicker from 'react-native-modal-datetime-picker'
 import {connect} from 'react-redux'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Select from 'react-native-picker-select'
-import { setSessions, loading, message, showMessage }  from '../../store/actions/index'
+import { setSessions, loading }  from '../../store/actions/index'
 import moment from 'moment'
 import getDomain from '../../lib/domain'
 import axios from 'axios'
@@ -82,8 +82,6 @@ class SessionModalScreen extends Component {
           this.props.navigator.dismissModal({animationType: 'slide-down'})
         }).catch(error => {
           console.log(error.response)
-          this.props.sendMessage("Something went wrong. Please try again.")
-          this.props.showMessage(true)
           this.props.showLoading(false)
           Alert.alert(
             'Error',
@@ -105,8 +103,6 @@ class SessionModalScreen extends Component {
           this.props.navigator.dismissModal({animationType: 'slide-down'})
         }).catch(error => {
           console.log(error.response)
-          this.props.sendMessage("Something went wrong. Please try again.")
-          this.props.showMessage(true)
           this.props.showLoading(false)
           Alert.alert(
             'Error',
@@ -250,7 +246,6 @@ class SessionModalScreen extends Component {
           </TouchableOpacity>
         </View>
         <Loading/>
-        <ShowMessage/>
       </View>
     )
   }
@@ -374,9 +369,7 @@ const mapStateToProps = state => {
 const mapDispacthToProps = (dispatch) => {
   return {
     setSessions: (sessions) => dispatch(setSessions(sessions)),
-    showLoading: (animate) => dispatch(loading(animate)),
-    showMessage: (show) => dispatch(showMessage(show)),
-    sendMessage: (text) => dispatch(message(text))
+    showLoading: (animate) => dispatch(loading(animate))
   }
 }
 
