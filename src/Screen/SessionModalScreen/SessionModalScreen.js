@@ -4,10 +4,12 @@ import TimePicker from 'react-native-modal-datetime-picker'
 import {connect} from 'react-redux'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Select from 'react-native-picker-select'
-import { setSessions }  from '../../store/actions/index'
+import { setSessions, loading, message, showMessage }  from '../../store/actions/index'
 import moment from 'moment'
 import getDomain from '../../lib/domain'
 import axios from 'axios'
+import Loading from '../../Component/Loading/Loading'
+import ShowMessage from '../../Component/ShowMessage/ShowMessage'
 
 class SessionModalScreen extends Component {
   state = {
@@ -64,6 +66,7 @@ class SessionModalScreen extends Component {
       )
       return
     }
+    this.props.showLoading(true)
     token = this.props.token
     user_id = (this.props.user.role[0] === "admin") ? this.state.selectedUser : this.props.user.id
     params = {date: this.props.date, user_id: user_id, client_id: this.props.client.id,
@@ -73,11 +76,15 @@ class SessionModalScreen extends Component {
         params, { 
         headers: {Authorization: `${token}`}
         }).then(res =>{
+          this.props.showLoading(false)
           this.props.setSessions(res.data)
           this.setState({caregiver_training: false, selectedUser: null, showCaregiverTraining: false, selectedpos: null})
           this.props.navigator.dismissModal({animationType: 'slide-down'})
         }).catch(error => {
           console.log(error.response)
+          this.props.sendMessage("Something went wrong. Please try again.")
+          this.props.showMessage(true)
+          this.props.showLoading(false)
           Alert.alert(
             'Error',
             error.response.data.join(", "),
@@ -92,11 +99,15 @@ class SessionModalScreen extends Component {
         params, { 
         headers: {Authorization: `${token}`}
         }).then(res =>{
+          this.props.showLoading(false)
           this.props.setSessions(res.data)
           this.setState({caregiver_training: false, selectedUser: null, showCaregiverTraining: false, selectedpos: null})
           this.props.navigator.dismissModal({animationType: 'slide-down'})
         }).catch(error => {
           console.log(error.response)
+          this.props.sendMessage("Something went wrong. Please try again.")
+          this.props.showMessage(true)
+          this.props.showLoading(false)
           Alert.alert(
             'Error',
             error.response.data.join(", "),
@@ -183,7 +194,7 @@ class SessionModalScreen extends Component {
                     <Select
                     placeholder={{ label: "Select Service", value: null }}
                     value={this.state.caregiver_training}
-                    style={{inputIOS: {color: "black",  padding: 10, borderBottomWidth: 0.5, borderBottomColor: "black", height: 50, width: "100%", fontSize: 12},
+                    style={{inputIOS: {color: "black",  padding: 10, borderBottomWidth: 0.5, borderBottomColor: "black", height: 50, width: "100%"},
                     inputAndroid: {color: "black", padding: 10, borderBottomWidth: 0.5, borderColor: "black", height: 50, width: "100%"}}}
                     items={[{ label: "BA Service", value: false, key: 1 }, { label: "Caregiver Training", value: true, key: 2}]}
                     onValueChange={(value) => this.setState({caregiver_training: value})}/>
@@ -238,6 +249,8 @@ class SessionModalScreen extends Component {
             <Text style={styles.button}>SAVE</Text>
           </TouchableOpacity>
         </View>
+        <Loading/>
+        <ShowMessage/>
       </View>
     )
   }
@@ -360,7 +373,10 @@ const mapStateToProps = state => {
 
 const mapDispacthToProps = (dispatch) => {
   return {
-    setSessions: (sessions) => dispatch(setSessions(sessions))
+    setSessions: (sessions) => dispatch(setSessions(sessions)),
+    showLoading: (animate) => dispatch(loading(animate)),
+    showMessage: (show) => dispatch(showMessage(show)),
+    sendMessage: (text) => dispatch(message(text))
   }
 }
 
