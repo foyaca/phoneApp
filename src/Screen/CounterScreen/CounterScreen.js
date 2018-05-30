@@ -15,6 +15,7 @@ class CounterScreen extends Component {
   }
 
   removeSession = () => {
+    this.props.showLoading(true)
     date = this.props.date
     user_id = this.props.instance.user.id
     token = this.props.token
@@ -22,6 +23,7 @@ class CounterScreen extends Component {
     axios.delete(`${getDomain(this.props.domain)}/sessions/${id}?user_id=${user_id}&date=${date}`,{ 
       headers: {Authorization: `${token}`}
     }).then(res =>{
+      this.props.showLoading(false)
       this.props.setSessions(res.data)
       this.props.navigator.pop({
         animated: true,
@@ -29,6 +31,7 @@ class CounterScreen extends Component {
       });
     }).catch(error => {
       console.log(error)
+      this.props.showLoading(false)
     })
   }
 
@@ -93,6 +96,7 @@ const mapStateToProps = state => {
 
 const mapDispacthToProps = (dispatch) => {
   return {
+    showLoading: (animate) => dispatch(loading(animate)),
     setSessions: (sessions) => dispatch(setSessions(sessions))
   }
 }
