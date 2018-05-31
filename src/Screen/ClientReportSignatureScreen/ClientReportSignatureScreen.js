@@ -147,6 +147,22 @@ class ClientReportModalScreen extends Component {
     })
   }
 
+  showImage = (image) => {
+    if (this.props.signature !== null && this.props.session.session_instances.length > 0) {
+      check = moment(this.props.session.session_instances.slice(-1)[0].created_at).isAfter(moment(this.props.signature.updated_at))
+      if (check) {
+        return (
+          <Text>Siganture not shown because there are sessions created after client signed</Text>
+        )
+      }
+      else {
+        return (
+          <Image style={styles.image} source={{uri: image}}/>
+        )
+      }
+    }
+  }
+
   render() {
     if (this.state.sessionInstance.length > 0) {
       clientbase64Icon = `data:image/png;base64`
@@ -154,6 +170,24 @@ class ClientReportModalScreen extends Component {
       if (this.props.signature !== null) {
         clientbase64Icon = `data:image/png;base64,${this.props.signature.client_signature}`
         userbase64Icon = `data:image/png;base64,${this.props.signature.user_signature}`
+      }
+      if (this.props.signature !== null && moment(this.props.session.session_instances.slice(-1)[0].created_at).isAfter(moment(this.props.signature.updated_at))) {
+        userImage = ( <View style={styles.signatureContainer}>   
+                        <Image style={styles.image} source={{uri: userbase64Icon}}/>
+                        <View style={styles.signature}>
+                          <Text>RBT/BCaBA/BCBA Signature</Text>
+                        </View>
+                      </View> 
+                    ) 
+      }
+      else {
+        userImage = ( <TouchableOpacity style={styles.signatureContainer} onPress={() => this.showUserSignature()}>   
+                        <Image style={styles.image} source={{uri: userbase64Icon}}/>
+                        <View style={styles.signature}>
+                          <Text>RBT/BCaBA/BCBA Signature</Text>
+                        </View>
+                      </TouchableOpacity> 
+                    ) 
       }
       return (
         <View style={styles.container}>
@@ -182,14 +216,9 @@ class ClientReportModalScreen extends Component {
             </ScrollView>
           </View>
           <View style={styles.ButtonContainer}>
-            <TouchableOpacity style={styles.signatureContainer} onPress={() => this.showUserSignature()}>
-              <Image style={styles.image} source={{uri: userbase64Icon}}/>
-              <View style={styles.signature}>
-                <Text>RBT/BCaBA/BCBA Signature</Text>
-              </View>
-            </TouchableOpacity>  
+            {userImage}
             <TouchableOpacity style={styles.signatureContainer} onPress={() => this.showClientSignature()}>
-              <Image style={styles.image} source={{uri: clientbase64Icon}}/>
+              {this.showImage(clientbase64Icon)}
               <View style={styles.signature}>
                 <Text>Parent/Caregiver Signature</Text>
               </View>

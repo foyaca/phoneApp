@@ -30,7 +30,6 @@ class ClientReportModalScreen extends Component {
     }).then(res =>{
       this.props.showLoading(false)
       this.props.setReportSessions(res.data)
-      console.log(res.data)
     }).catch(error => {
       console.log(error)
       this.props.sendMessage("Something went wrong. Please try again.")
