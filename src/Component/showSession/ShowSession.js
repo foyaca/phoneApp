@@ -23,10 +23,10 @@ class ShowClient extends Component {
         <TouchableOpacity onPress={this.props.onSessionPressed}>
           <View style={styles.container}>
             <View style={styles.listItem}>
-              <View>
-                <Text style={styles.clientBox}>{this.props.session.user.name}</Text>
+              <View style={styles.userName}>
+                <Text style={styles.clientBox}>{this.props.session.user.name.split(" ").slice(0,2).join(" ")}</Text>
               </View>
-              <View>
+              <View style={styles.iconContainer}>
                 <Icon name="person" size={80} color="#00264d" style={styles.icon}/>
               </View>
             </View>
@@ -45,10 +45,10 @@ class ShowClient extends Component {
         <TouchableOpacity onPress={this.onPressSession}>
           <View style={styles.container}>
             <View style={styles.listItem}>
-              <View>
-                <Text style={styles.clientBox}>{this.props.session.user.name}</Text>
+              <View style={styles.userName}>
+                <Text style={styles.clientBox}>{this.props.session.user.name.split(" ").slice(0,2).join(" ")}</Text>
               </View>
-              <View>
+              <View style={styles.iconContainer}> 
                 <Icon name="person" size={80} color="#00264d" style={styles.icon}/>
               </View>
             </View>
@@ -78,13 +78,18 @@ const styles = StyleSheet.create({
   },
   listItem: {
     flexDirection: "column",
-    padding: 20,
     height: "100%",
     width: "40%",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#ecf2f9"
     
+  },
+  userName: {
+    height: "20%",
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
   clientBox: {
     fontSize: 15,

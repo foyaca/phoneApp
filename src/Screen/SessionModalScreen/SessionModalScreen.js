@@ -32,7 +32,14 @@ class SessionModalScreen extends Component {
         params: { client_id , date }, 
         headers: {Authorization: `${token}`}
       }).then(res =>{
-        this.setState({users: res.data})
+        ids = []
+        users = res.data.filter((u) => {
+          if (!ids.includes(u.id)) {
+            ids.push(u.id)
+            return u
+          }
+        })
+        this.setState({users})
       }).catch(error => {
         console.log(error)
       })

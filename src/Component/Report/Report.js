@@ -55,7 +55,14 @@ class Report extends Component {
         params: { client_id , date }, 
         headers: {Authorization: `${token}`}
       }).then(res =>{
-        this.props.setReportUsers(res.data)
+        ids = []
+        users = res.data.filter((u) => {
+          if (!ids.includes(u.id)) {
+            ids.push(u.id)
+            return u
+          }
+        })
+        this.props.setReportUsers(users)
         this.props.showLoading(false)
         this.props.showMessage(false)
       }).catch(error => {

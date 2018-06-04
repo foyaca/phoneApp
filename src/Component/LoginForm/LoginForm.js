@@ -111,7 +111,7 @@ class LoginForm extends Component {
         <View style={styles.formContainer }>
           <ImageBackground source={path} style={styles.backgroundImage}/>
           <View style={styles.form}>
-            <TextInput style={styles.input} placeholder={"Insert Domain.  Ex: google.com"} underlineColorAndroid="transparent" onChangeText={this.domainChangedHandler} value={this.props.domain} />
+            <TextInput style={[styles.input, {marginTop: "20%"}]} placeholder={"Insert Domain.  Ex: google.com"} underlineColorAndroid="transparent" onChangeText={this.domainChangedHandler} value={this.props.domain} />
             <TextInput style={styles.input} placeholder={"Insert E-mail"} underlineColorAndroid="transparent" onChangeText={this.emailChangedHandler} />
             <TextInput style={styles.input} placeholder={"Insert Password"} secureTextEntry={true} underlineColorAndroid="transparent" onChangeText={this.passChangedHandler}/>
             <TouchableOpacity onPress={this.LogIn} style={styles.button}>
@@ -139,7 +139,6 @@ const styles = StyleSheet.create({
   formContainer: {
     width: '100%',
     height: '80%',
-    padding: 20,
     alignItems: 'center'
   },
   backgroundImage: {
@@ -151,25 +150,25 @@ const styles = StyleSheet.create({
   form: {
     width: "100%",
     backgroundColor: "#ecf2f9",
-    marginTop: 74,
-    height: "76%",
+    height: "100%",
     alignItems: 'center',
-    padding: 20,
-    borderRadius: 10
+    justifyContent: "center",
+    borderRadius: 10,
+    zIndex: -1
   },
   input: {
-    width: "100%",
-    padding: 10,
-    height: 50,
-    margin: 10,
+    width: "90%",
+    height: "12%",
+    margin: "3%",
+    paddingLeft: 20,
     borderColor: '#4080bf',
     borderWidth: 1,
     borderRadius: 5
   },
   button: {
-    width: "100%",
-    height: 50,
-    marginTop: 20,
+    width: "90%",
+    height: "12%",
+    margin: "5%",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#4080bf",
