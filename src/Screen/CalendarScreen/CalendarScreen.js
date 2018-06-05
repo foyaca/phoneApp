@@ -1,11 +1,12 @@
 import React, { Component} from 'react'
-import { View, StyleSheet} from 'react-native'
+import { View, StyleSheet, Alert} from 'react-native'
 import ShowCalendar from '../../Component/ShowCalendar/ShowCalendar'
 import { connect } from 'react-redux'
 import { setDate, removeClients, unselectClient, showMessage, loading } from '../../store/actions/index'
 import Loading from '../../Component/Loading/Loading'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import App from '../../../App'
+import moment from 'moment'
 
 class CalendarScreen extends Component {
   constructor(props) {
@@ -24,6 +25,17 @@ class CalendarScreen extends Component {
   }
 
   getClients = (date) => {
+    if (this.props.user.role[0] === "RBT" && moment().isBefore(date)) {
+      Alert.alert(
+        'Error',
+        'You can only schedule up to today\'s date',
+        [
+          {text: 'OK', onPress: () => null, style: 'cancel'}
+        ],
+        { cancelable: false }
+      )
+      return
+    }
     this.props.showLoading(true)
     this.props.setDate(date)
     this.props.navigator.push({
@@ -62,7 +74,8 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => {
   return {
-    token: state.auth.token
+    token: state.auth.token,
+    user: state.user.user
   }
 }
 

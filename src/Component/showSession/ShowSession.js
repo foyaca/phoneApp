@@ -6,10 +6,10 @@ import {connect} from 'react-redux'
 
 class ShowClient extends Component {
 
-  onPressSession = () => {
+  onPressSession = (sms) => {
     Alert.alert(
       'Sorry!!!',
-      'You cannot manage this session',
+      sms,
       [
         {text: 'OK', onPress: () => null}
       ],
@@ -19,30 +19,31 @@ class ShowClient extends Component {
 
   render() {
     if (this.props.user.id === this.props.session.user.id || ( this.props.user.role !== undefined && this.props.user.role[0] === "admin")){
-      return (
-        <TouchableOpacity onPress={this.props.onSessionPressed}>
-          <View style={styles.container}>
-            <View style={styles.listItem}>
-              <View style={styles.userName}>
-                <Text style={styles.clientBox}>{this.props.session.user.name.split(" ").slice(0,2).join(" ")}</Text>
+      if (!this.props.session.locked) {
+        return (
+          <TouchableOpacity onPress={this.props.onSessionPressed}>
+            <View style={styles.container}>
+              <View style={styles.listItem}>
+                <View style={styles.userName}>
+                  <Text style={styles.clientBox}>{this.props.session.user.name.split(" ").slice(0,2).join(" ")}</Text>
+                </View>
+                <View style={styles.iconContainer}>
+                  <Icon name="person" size={80} color="#00264d" style={styles.icon}/>
+                </View>
               </View>
-              <View style={styles.iconContainer}>
-                <Icon name="person" size={80} color="#00264d" style={styles.icon}/>
+              <View style={styles.info}>
+                <Text style={styles.header}>Added Session</Text>
+                <Text style={styles.pos}>POS: {this.props.session.instance.place_of_service}</Text>
+                <Text style={styles.time}>Start Time: {moment(this.props.session.instance.start_time).utc().format("h:mm A")}</Text>
+                <Text style={styles.time}>End Time: {moment(this.props.session.instance.end_time).utc().format("h:mm A")}</Text>
               </View>
             </View>
-            <View style={styles.info}>
-              <Text style={styles.header}>Added Session</Text>
-              <Text style={styles.pos}>POS: {this.props.session.instance.place_of_service}</Text>
-              <Text style={styles.time}>Start Time: {moment(this.props.session.instance.start_time).utc().format("h:mm A")}</Text>
-              <Text style={styles.time}>End Time: {moment(this.props.session.instance.end_time).utc().format("h:mm A")}</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
-      )
-    }
-    else {
-      return(
-        <TouchableOpacity onPress={this.onPressSession}>
+          </TouchableOpacity>
+        )
+      }
+      else {
+        return (
+        <TouchableOpacity onPress={() => this.onPressSession("This session is locked")}>
           <View style={styles.container}>
             <View style={styles.listItem}>
               <View style={styles.userName}>
@@ -53,7 +54,30 @@ class ShowClient extends Component {
               </View>
             </View>
             <View style={styles.info}>
-              <Text style={styles.header}>Added Session</Text>
+              <Text style={styles.header}>Session Locked</Text>
+              <Text style={styles.pos}>POS: {this.props.session.instance.place_of_service}</Text>
+              <Text style={styles.time}>Start Time: {moment(this.props.session.instance.start_time).utc().format("hh:mm A")}</Text>
+              <Text style={styles.time}>End Time: {moment(this.props.session.instance.end_time).utc().format("hh:mm A")}</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+        )
+      }
+    }
+    else {
+      return(
+        <TouchableOpacity onPress={() => this.onPressSession("You cannot manage this session")}>
+          <View style={styles.container}>
+            <View style={styles.listItem}>
+              <View style={styles.userName}>
+                <Text style={styles.clientBox}>{this.props.session.user.name.split(" ").slice(0,2).join(" ")}</Text>
+              </View>
+              <View style={styles.iconContainer}> 
+                <Icon name="person" size={80} color="#00264d" style={styles.icon}/>
+              </View>
+            </View>
+            <View style={styles.info}>
+              <Text style={styles.header}>{!this.props.session.locked ? "Session Locked" : "Session Locked"}</Text>
               <Text style={styles.pos}>POS: {this.props.session.instance.place_of_service}</Text>
               <Text style={styles.time}>Start Time: {moment(this.props.session.instance.start_time).utc().format("hh:mm A")}</Text>
               <Text style={styles.time}>End Time: {moment(this.props.session.instance.end_time).utc().format("hh:mm A")}</Text>

@@ -35,7 +35,7 @@ class Session extends Component {
     instances = []
     for (session of this.props.sessions) {
       for (instance of session.session_instances) {
-        instances.push({instance: instance, user: session.user})
+        instances.push({instance: instance, user: session.user, locked: session.locked})
       }
     }
     return instances
@@ -44,6 +44,13 @@ class Session extends Component {
   render() {
     if (this.props.sessions.length > 0 && !this.props.loading) {
       instances = this.get_instances(this.props.sessions)
+      addButton = null
+      if (!instances[0].locked) {
+        addButton = (<TouchableOpacity onPress={this.props.createSession} style={styles.button}>
+                        <Icon name="add-circle" size={60} color="#00BFA5"/>
+                      </TouchableOpacity>
+                    )
+      }
       return (
         <View style={styles.container}>
           <View style={styles.dateContainer}>
@@ -60,9 +67,7 @@ class Session extends Component {
               )}
               keyExtractor={(item, index) => index}
             />
-            <TouchableOpacity onPress={this.props.createSession} style={styles.button}>
-              <Icon name="add-circle" size={60} color="#00BFA5"/>
-            </TouchableOpacity>
+            {addButton}
         </View>
       )
 
