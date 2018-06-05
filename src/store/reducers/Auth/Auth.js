@@ -1,8 +1,8 @@
 import { SET_TOKEN, SET_EMAIL, SET_PASSWORD, REMOVE_TOKEN, REMOVE_EMAIL, REMOVE_PASSWORD, SET_DOMAIN, REMOVE_DOMAIN} from '../../actions/actionTypes'
 
 const initialState = {
-  email: "frank@example.com",
-  password: "12345678",
+  email: "",
+  password: "",
   token: null,
   domain: ""
 }
