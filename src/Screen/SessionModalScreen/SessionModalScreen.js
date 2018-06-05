@@ -4,7 +4,7 @@ import TimePicker from 'react-native-modal-datetime-picker'
 import {connect} from 'react-redux'
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import Select from 'react-native-picker-select'
-import { setSessions, loading }  from '../../store/actions/index'
+import { setSessions, loading, selectInstance }  from '../../store/actions/index'
 import moment from 'moment'
 import getDomain from '../../lib/domain'
 import axios from 'axios'
@@ -50,6 +50,16 @@ class SessionModalScreen extends Component {
     super(props)
   }
 
+  get_instances = (sessions, id) => {
+    for (session of sessions) {
+      for (instance of session.session_instances) {
+        if (instance.id === id) {
+          return {instance: instance, user: session.user}
+        }
+      }
+    }
+  }
+
   submit = () => {
     if (this.state.selectedpos === null) {
       Alert.alert(
@@ -85,6 +95,8 @@ class SessionModalScreen extends Component {
         }).then(res =>{
           this.props.showLoading(false)
           this.props.setSessions(res.data)
+          instance = this.get_instances(res.data, this.props.instance.instance.id)
+          this.props.selectInstance(instance)
           this.setState({caregiver_training: false, selectedUser: null, showCaregiverTraining: false, selectedpos: null})
           this.props.navigator.dismissModal({animationType: 'slide-down'})
         }).catch(error => {
@@ -376,6 +388,7 @@ const mapStateToProps = state => {
 const mapDispacthToProps = (dispatch) => {
   return {
     setSessions: (sessions) => dispatch(setSessions(sessions)),
+    selectInstance: (instance) => dispatch(selectInstance(instance)),
     showLoading: (animate) => dispatch(loading(animate))
   }
 }

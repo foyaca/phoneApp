@@ -22,7 +22,7 @@ class SessionScreen extends Component {
     }
   }
 
-  getSession = (sessions, id) => {
+  getSession = (id) => {
     for (session of this.props.sessions) {
       for (instance of session.session_instances) {
         if (instance.id === id)
@@ -33,7 +33,7 @@ class SessionScreen extends Component {
 
   onSessionPressed = (sessionInstance) => {
     this.props.showLoading(true)
-    session = this.getSession(this.props.sessions, sessionInstance.instance.id)
+    session = this.getSession(sessionInstance.instance.id)
     this.props.selectInstance(sessionInstance)
     this.props.selectSession(session)
     Promise.all([
